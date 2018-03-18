@@ -66,6 +66,7 @@ class NStepSARSAAgent(Agent):
         self.num_episodes = num_episodes
 
         for episode in range(num_episodes):
+            print('episode: {}'.format(episode))
             S_list = []
             R_list = []
             A_list = []
@@ -77,7 +78,6 @@ class NStepSARSAAgent(Agent):
 
             T = np.inf
             while True:
-                print('t: {}'.format(t))
                 if t < T:
                     (s, r, done, info) = self.env.step(A_list[t])
                     S_list.append(s)
@@ -88,21 +88,18 @@ class NStepSARSAAgent(Agent):
                     else:
                         A_list.append(self.select_action(S_list[t + 1]))
                 tau = t - n + 1
-                print('tau: {}'.format(tau))
-                print('len s list: {}'.format(len(S_list)))
-                print('len a list: {}'.format(len(A_list)))
-                print()
                 if tau >= 0:
                     G = 0
-                    for i in range(tau + 1, min(tau + n, T)):
+                    for i in range(tau + 1, min(tau + n, T) + 1):
                         G += R_list[i] * (self.gamma ** (i - tau - 1))
                     if (tau + n) < T:
-                        G = G + (self.gamma ** n) * self.state_action_values(
+                        G += (self.gamma ** n) * self.state_action_values(
                             S_list[tau + n], A_list[tau + n])
                     self.weights[self.active_tiles(
                         S_list[tau], A_list[tau])] += self.alpha * \
                         (G - self.state_action_values(S_list[tau], A_list[tau]))
-                if tau == (T + 1):
+                if tau == (T - 1):
+                    print('Episode reward: {}'.format(sum(R_list)))
                     break
                 t += 1
                 
