@@ -25,8 +25,7 @@ class NStepSARSAAgent(Agent):
         (x_min, v_min, theta_min,
             theta_dot_min) = self.env.observation_space.low
 
-
-        #  The domains for the velocity of the cart and the angular 
+        #  The domains for the velocity of the cart and the angular
         #  velocity of the pole is very large
         theta_dot_max /= 1e37
         theta_dot_min /= 1e37
@@ -95,12 +94,13 @@ class NStepSARSAAgent(Agent):
                     if (tau + n) < T:
                         G += (self.gamma ** n) * self.state_action_values(
                             S_list[tau + n], A_list[tau + n])
-                    self.weights[self.active_tiles(
-                        S_list[tau], A_list[tau])] += self.alpha * \
-                        (G - self.state_action_values(S_list[tau], A_list[tau]))
+                            
+                    s, a = (S_list[tau], A_list[tau])
+                    self.weights[self.active_tiles(s, a)] += self.alpha * (
+                        G - self.state_action_values(s, a))
                 if tau == (T - 1):
                     print('Episode reward: {}'.format(sum(R_list)))
                     break
                 t += 1
-                
+
         self.env.close()
